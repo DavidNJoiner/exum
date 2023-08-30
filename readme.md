@@ -15,3 +15,5 @@ Exnum provides a solution for retrieving contacts from an Android phone without 
   6. Upon successful completion, you will find a file named contactinfo.txt in your /home directory.
 
 Remember, before running any script or tool, especially ones that interact with device data or settings, always ensure you understand its operation and implications.
+
+## TODO : fetch whatsqpp/telegram contacts and photos.
