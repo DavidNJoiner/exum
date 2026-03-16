@@ -1,19 +1,55 @@
-# Exnum Instructions
+# Exnum – Extract Contacts from Android (No Root, Broken Screen)
 
-Exnum provides a solution for retrieving contacts from an Android phone without root access. The Android security model is built to prevent unauthorized data access. If you've found yourself with a broken phone screen and without a recent backup of your contacts, it might seem like you're out of luck. Rooting the phone isn't an option either, as this would erase all your data.
+**Exnum** is a lightweight, open-source tool that helps recover your **contacts** from an Android phone — even when the screen is broken or unresponsive — **without requiring root access**.
 
-  **Important :** *Your phone must have previously been set to developer mode with USB debugging enabled.
-    Even if the screen is broken, you should be able to interact with it blindly. This is necessary for steps like selecting "File Transfer" as the USB mode and authorizing app access to your contacts.*
+Many people face this exact situation: a phone with a shattered/unresponsive display, no cloud/Google backup of contacts, and no desire (or possibility) to root the device (which often wipes data anyway). Exnum offers a practical workaround using **Android Debug Bridge (ADB)** and a small, specially crafted debuggable app.
 
-## Steps to Run Exnum:
+### How It Works (High-Level Overview)
 
-  1. Connect your phone to your computer.
-  2. When prompted with "Use USB for," select "File Transfer."
-  3. Navigate (cd) to the directory containing the exnum.sh script.
-  4 .Execute the script using: `./exnum.sh`
-  5. Blindly authorize the app to access your contacts when prompted on your phone.
-  6. Upon successful completion, you will find a file named contactinfo.txt in your /home directory.
+1. A tiny Android app (`exnum.apk`) is installed via ADB.
+2. The app requests **READ_CONTACTS** permission (you confirm this manually — even blindly if the screen is broken).
+3. The app reads your contacts and saves them into its private app-specific storage (`/data/data/com.example.debugcontacts/files/contacts.txt`).
+4. Using ADB's `run-as` command (only works for **debuggable** apps), we extract that file to your computer.
 
-Remember, before running any script or tool, especially ones that interact with device data or settings, always ensure you understand its operation and implications.
+This method relies on:
+- USB debugging having been previously enabled
+- The ability to authorize USB debugging and grant permissions (possibly blindly)
 
-## TODO : fetch whatsqpp/telegram contacts and photos.
+### Important Requirements & Limitations
+
+**Your phone MUST meet ALL of these conditions:**
+
+- **USB debugging** was enabled **before** the screen broke  
+  (Settings → Developer options → USB debugging)
+- You previously allowed **USB debugging authorization** from this computer  
+  (the RSA key popup was accepted at least once)
+- The device can still boot and connect via USB (not completely dead)
+- Android version: tested on Android 9–14; Android 15+ may have tightened restrictions
+- The phone must allow **blind interaction** for:
+  - Selecting "File Transfer" / MTP mode when connecting USB
+  - Granting "Allow access to contacts" when the app launches
+
+### Step-by-Step Usage
+
+1. **Prepare your computer**
+   - Install latest [Android platform-tools (ADB)](https://developer.android.com/tools/releases/platform-tools)
+   - Make sure `adb` is in your PATH or run from the platform-tools folder
+
+2. **Connect the phone**
+   - Plug the USB cable into the broken phone and your computer
+   - If the phone vibrates or makes a sound → it's alive
+   - When the USB options appear (usually "Charging only" / "File Transfer" / "MTP"), **blindly select File Transfer**:
+     - Many devices: tap near the **bottom half** of the screen 2–3 times
+     - Or try: volume keys to navigate + power to select (device-dependent)
+
+3. **Run the extraction script**
+   - Place `exnum.apk`, `exnum.sh` (Linux/macOS) or `exnum.bat` (Windows) in one folder
+   - Open terminal / command prompt in that folder
+     
+   - Linux/macOS:  
+     ```bash
+     chmod +x exnum.sh
+     ./exnum.sh
+     
+   - Windows:
+     double-click exnum.bat or run in cmd
